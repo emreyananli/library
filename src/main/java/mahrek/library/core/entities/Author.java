@@ -37,7 +37,6 @@ public class Author {
 	@Column (name="last_name")
 	private String lastName;
 	
-	
 	//@OneToOne (cascade = CascadeType.REMOVE)
 	//@JoinColumn(name = "person_id")
 	//private Person person;

@@ -1,6 +1,7 @@
 package mahrek.library.business.concretes;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,10 +9,14 @@ import org.springframework.stereotype.Service;
 import mahrek.library.business.abstracts.StudentService;
 import mahrek.library.core.utilities.results.DataResult;
 import mahrek.library.core.utilities.results.ErrorDataResult;
+import mahrek.library.core.utilities.results.Result;
 import mahrek.library.core.utilities.results.SuccessDataResult;
+import mahrek.library.core.utilities.results.SuccessResult;
 import mahrek.library.dataAccess.abstracts.StudentDao;
 import mahrek.library.entities.concretes.Student;
+import mahrek.library.entities.concretes.dtos.StudentAddDto;
 import mahrek.library.entities.concretes.dtos.StudentDto;
+import mahrek.library.entities.concretes.dtos.StudentGetDto;
 
 @Service
 public class StudentManager implements StudentService{
@@ -19,18 +24,42 @@ public class StudentManager implements StudentService{
 	@Autowired
 	
 	private StudentDao studentDao;
+	
+	private StudentGetDto convertEntityToDto(Student student){
+        StudentGetDto newStudentGetDto = new StudentGetDto();
+        newStudentGetDto.setStudentId(student.getStudentId());
+        newStudentGetDto.setStudentNo(student.getStudentNo());
+        newStudentGetDto.setFirstName(student.getFirstName());
+        newStudentGetDto.setLastName(student.getLastName());
+        newStudentGetDto.setDateofbirth(student.getDateofbirth());
+        newStudentGetDto.setGender(student.getGender());
+    
+        return newStudentGetDto;
+    }
+	
+	@Override
+    public DataResult<List<StudentGetDto>> getAll() {
+        return new SuccessDataResult<List<StudentGetDto>>(studentDao.findAll()
+                .stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList()), "Bilgiler listelendi.");
+    }
 
 	@Override
-	public DataResult<List<Student>> getAll() {
-		
-		return new SuccessDataResult<List<Student>>(this.studentDao.findAll(),"veriler listelendi");
-		
-	}
+	public Result addStudent(StudentAddDto studentAddDto) {
+			
+            Student newStudent = new Student();
 
-	@Override
-	public DataResult<Student> add(Student student) {
-		
-		return new SuccessDataResult<Student>(this.studentDao.save(student), "Student getirildi.");
+            newStudent.setStudentNo(studentAddDto.getStudentNo());
+            newStudent.setFirstName(studentAddDto.getFirstName());
+            newStudent.setLastName(studentAddDto.getLastName());
+            newStudent.setDateofbirth(studentAddDto.getDateofbirth());
+            newStudent.setGender(studentAddDto.getGender());
+            
+            studentDao.save(newStudent);
+            
+            return new SuccessResult("Yeni öğrenci listeye eklendi.");
+        
 	} 
 	
 	@Override

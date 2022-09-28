@@ -3,6 +3,7 @@ package mahrek.library.core.dataAccess;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import mahrek.library.core.entities.Book;
@@ -20,6 +21,10 @@ public interface BookDao extends JpaRepository<Book, Integer>{
 	boolean existsByBookName(String bookName);
 	
 	Book getByBookName(String bookName);
+	
+	@Modifying
+    @Query("update Book bo set bo.bookName=?2 where bo.bookId=?1")
+    Book updateAddress(int bookId, String bookName);
 		
 	@Query("Select new mahrek.library.core.entities.dtos.BookDto"
 		+"(bo.bookId, bo.bookName, bo.pagecount,"
@@ -32,12 +37,4 @@ public interface BookDao extends JpaRepository<Book, Integer>{
 		+"g.genreId, g.genreName)"
 		+"from Book bo Inner Join bo.genre g")
 		List<BookDto> getBookWithGenreDetails();
-		
-		/*		@Query("Select new mahrek.library.entities.concretes.dtos.BorrowDto"
-		+"(b.borrowId, b.takenDate, b.broughtDate,"
-		+"s.studentId, s.studentNo"
-		+"bo.bookName, bo.pagecount)"
-		+"from Borrow b Inner Join b.student s"
-		+"Inner Join b.book bo")
-		List<BorrowDto> findAllBorrow(); */
-}
+}		

@@ -42,13 +42,13 @@ public class AuthorsController {
 	}
 
 	@PostMapping("/add")
-	public Result add(@RequestBody Author author) {
-		return this.authorService.add(author);
+	public ResponseEntity<?> add(@RequestBody Author author) {
+		return ResponseEntity.ok(this.authorService.add(author));
 	}
 	
 	@GetMapping(value = "/findById")
-	public ResponseEntity<?> findById(@RequestParam int authorId){
-		return ResponseEntity.ok(this.authorService.findById(authorId));
+	public DataResult<Author> findById(@RequestParam int authorId){
+		return this.authorService.findById(authorId);
 	}
 	
 	@DeleteMapping(value = "/deleteById")

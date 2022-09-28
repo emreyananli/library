@@ -43,13 +43,13 @@ public class BorrowsController {
 	}	
 		
 	@PostMapping("/add")
-	public Result add(@RequestBody Borrow borrow) {
-		return this.borrowService.add(borrow);
+	public ResponseEntity<?> add(@RequestBody Borrow borrow) {
+		return ResponseEntity.ok(this.borrowService.add(borrow));
 	}
 	
 	@GetMapping(value = "/findById")
-	public ResponseEntity<?> findById(@RequestParam int borrowId){
-		return ResponseEntity.ok(this.borrowService.findById(borrowId));
+	public DataResult<Borrow> findById(@RequestParam int borrowId){
+		return this.borrowService.findById(borrowId);
 	}
 		
 	@DeleteMapping(value = "/deleteById")
@@ -58,13 +58,13 @@ public class BorrowsController {
 	}
 		
 	@GetMapping(value = "/findByTakenDate")
-	public ResponseEntity<?> findByTakenDate(@RequestParam Date takenDate){
-		return ResponseEntity.ok(this.borrowService.findByTakenDate(takenDate));
+	public DataResult<List<Borrow>> findByTakenDate(@RequestParam Date takenDate){
+		return this.borrowService.findByTakenDate(takenDate);
 	}
 		
 	@GetMapping(value = "/findByBroughtDate")
-	public ResponseEntity<?> findByBroughtDate(@RequestParam Date broughtDate){
-		return ResponseEntity.ok(this.borrowService.findByBroughtDate(broughtDate));
+	public DataResult<List<Borrow>> findByBroughtDate(@RequestParam Date broughtDate){
+		return this.borrowService.findByBroughtDate(broughtDate);
 	}
 		
 	@GetMapping("/getBorrowWithStudentDetails")

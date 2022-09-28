@@ -20,7 +20,9 @@ import mahrek.library.core.utilities.results.DataResult;
 import mahrek.library.core.utilities.results.ErrorDataResult;
 import mahrek.library.core.utilities.results.Result;
 import mahrek.library.entities.concretes.Student;
+import mahrek.library.entities.concretes.dtos.StudentAddDto;
 import mahrek.library.entities.concretes.dtos.StudentDto;
+import mahrek.library.entities.concretes.dtos.StudentGetDto;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,18 +40,18 @@ public class StudentsController {
 	
 	
 	@GetMapping("/getall")
-	public DataResult<List<Student>> getall(){
+	public DataResult<List<StudentGetDto>> getall(){
 		return this.studentService.getAll();
 	}
 	
 	@PostMapping("/add")
-	public Result add(@RequestBody Student student) {
-		return this.studentService.add(student);
+	public ResponseEntity<?> addStudent(@RequestBody StudentAddDto studentAddDto) {
+		return ResponseEntity.ok(this.studentService.addStudent(studentAddDto));
 	}
 	
 	@GetMapping(value = "/findById")
-	public ResponseEntity<?> findById(@RequestParam int studentId){
-		return ResponseEntity.ok(this.studentService.findById(studentId));
+	public DataResult<Student> findById(@RequestParam int studentId){
+		return this.studentService.findById(studentId);
 	}
 	
 	@DeleteMapping(value = "/deleteById")
@@ -58,8 +60,8 @@ public class StudentsController {
 	}
 	
 	@GetMapping(value = "/findByNo")
-	public ResponseEntity<?> findByStudentNo(@RequestParam int studentNo){
-		return ResponseEntity.ok(this.studentService.findByStudentNo(studentNo));
+	public DataResult<Student> findByStudentNo(@RequestParam int studentNo){
+		return this.studentService.findByStudentNo(studentNo);
 	}
 	
 	@GetMapping("/getByStudentName")

@@ -1,17 +1,25 @@
 package mahrek.library.business.concretes;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import mahrek.library.business.abstracts.BookService;
 import mahrek.library.core.dataAccess.BookDao;
 import mahrek.library.core.entities.Book;
+import mahrek.library.core.entities.dtos.BookAddDto;
 import mahrek.library.core.entities.dtos.BookDto;
+import mahrek.library.core.entities.dtos.BookGetDto;
 import mahrek.library.core.utilities.results.DataResult;
 import mahrek.library.core.utilities.results.ErrorDataResult;
+import mahrek.library.core.utilities.results.Result;
 import mahrek.library.core.utilities.results.SuccessDataResult;
+import mahrek.library.core.utilities.results.SuccessResult;
 
 @Service
 public class BookManager implements BookService{
@@ -19,19 +27,39 @@ public class BookManager implements BookService{
 	@Autowired
 	private BookDao bookDao;
 	
+	private BookGetDto convertEntityToDto(Book book){
+        BookGetDto newBookGetDto = new BookGetDto();
+        newBookGetDto.setBookId(book.getBookId());
+        newBookGetDto.setBookName(book.getBookName());
+        newBookGetDto.setPagecount(book.getPagecount());
+   
+        return newBookGetDto;
+    }
+	
 	@Override
-	public DataResult<List<Book>> getAll() {
-		
-		return new SuccessDataResult<List<Book>>(this.bookDao.findAll(),"kitaplar listelendi");
+    public DataResult<List<BookGetDto>> getAll() {
+        return new SuccessDataResult<List<BookGetDto>>(bookDao.findAll()
+                .stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList()), "Kitaplar listelendi.");
+    }
+
+	@Override
+	public Result addBook(BookAddDto bookAddDto) {
+			
+            Book newBook = new Book();
+
+            newBook.setBookName(bookAddDto.getBookName());
+            newBook.setPagecount(bookAddDto.getPagecount());
+            
+            bookDao.save(newBook);
+            
+            return new SuccessResult("Yeni kitap listeye eklendi.");
+        
 	}
 
 	@Override
-	public DataResult<Book> add(Book book) {
-		
-		return new SuccessDataResult<Book>(bookDao.save(book), "kitap eklendi");
-	}
-
-	@Override
+    @Cacheable(cacheNames = "books", key="#book.bookId")
 	public DataResult<Book> findById(int bookId) {
 	
 	if(this.bookDao.existsById(bookId)) {
@@ -46,6 +74,7 @@ public class BookManager implements BookService{
 		}
 	
 	@Override
+    @CacheEvict(cacheNames = "books", key = "#book.bookId")
 	public DataResult<Book> deleteById(int bookId) {
 		
 	if(this.bookDao.existsById(bookId)) {
@@ -61,6 +90,13 @@ public class BookManager implements BookService{
 	}
 	
 	@Override
+    @CachePut(cacheNames = "books", key="#book.bookId")
+    public DataResult<Book> updateBook(Book book) {
+        
+        return new SuccessDataResult<Book>(this.bookDao.updateAddress(book.getBookId(), book.getBookName()), "Kitap update edildi");
+    }
+	
+	@Override
 	public DataResult<Book> getByBookName(String bookName) {
 		
 		if(this.bookDao.existsByBookName(bookName)) {
@@ -74,15 +110,11 @@ public class BookManager implements BookService{
 		
 	}
 
-
-	
 	@Override
 	public DataResult<List<BookDto>> getBookWithAuthorDetails() {
 		
 		return new SuccessDataResult<List<BookDto>>(this.bookDao.getBookWithAuthorDetails(),"Data listelendi");
 	}
-
-	
 
 	@Override
 	public DataResult<List<BookDto>> getBookWithGenreDetails() {
@@ -90,5 +122,3 @@ public class BookManager implements BookService{
 		return new SuccessDataResult<List<BookDto>>(this.bookDao.getBookWithGenreDetails(),"Data listelendi");
 	}
 }
-
-	

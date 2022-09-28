@@ -40,13 +40,13 @@ public class PersonsController {
 	}
 
 	@PostMapping("/add")
-	public Result add(@RequestBody Person person) {
-		return this.personService.add(person);
+	public ResponseEntity<?> add(@RequestBody Person person) {
+		return ResponseEntity.ok(this.personService.add(person));
 	}
 		
 	@GetMapping(value = "/findById")
-	public ResponseEntity<?> findById(@RequestParam int personId){
-		return ResponseEntity.ok(this.personService.findById(personId));
+	public DataResult<Person> findById(@RequestParam int personId){
+		return this.personService.findById(personId);
 	}
 		
 	@DeleteMapping(value = "/deleteById")

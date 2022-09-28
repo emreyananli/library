@@ -40,13 +40,13 @@ public class GenresController {
 	}
 
 	@PostMapping("/add")
-	public Result add(@RequestBody Genre genre) {
-		return this.genreService.add(genre);
+	public ResponseEntity<?> add(@RequestBody Genre genre) {
+		return ResponseEntity.ok(this.genreService.add(genre));
 	}
 	
 	@GetMapping(value = "/findById")
-	public ResponseEntity<?> findById(@RequestParam int genreId){
-		return ResponseEntity.ok(this.genreService.findById(genreId));
+	public DataResult<Genre> findById(@RequestParam int genreId){
+		return this.genreService.findById(genreId);
 	}
 	
 	@DeleteMapping(value = "/deleteById")
